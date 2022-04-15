@@ -87,3 +87,11 @@ class TitleReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
+
+# class ReviewSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         fields = ('pub_date', 'review')
+#         model = Category
+#         lookup_field = 'slug'

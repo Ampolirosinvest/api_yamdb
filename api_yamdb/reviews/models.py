@@ -150,14 +150,17 @@ class Review(models.Model):
         # blank=True,
         # null=True
     )
-    reviewer = models.ForeignKey(User,
-                                 on_delete=models.CASCADE,
-                                 related_name='reviewer')
-    pub_time = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
-    title = models.ForeignKey(Title,
-                              on_delete=models.CASCADE,
-                              related_name='title')
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviewer'
+    )
+    pub_time = models.DateTimeField('Дата добавления', auto_now_add=True)
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='title'
+    )
     rating = models.IntegerField(validators=[MinValueValidator(1),
                                              MaxValueValidator(10)])
 
@@ -178,7 +181,7 @@ class Comment(models.Model):
         Review, on_delete=models.CASCADE, related_name='review')
     text = models.TextField()
     created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Дата добавления', auto_now_add=True) # , db_index=True)
     
     class Meta:
         ordering = ('id',)

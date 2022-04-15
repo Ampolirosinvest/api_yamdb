@@ -14,7 +14,7 @@ from api.serializers import (SignUpSerializer, TokenSerializer, UserSerializer,
                             CategorySerializer, GenreSerializer, TitleCreateSerializer, TitleReadSerializer)
 from api.permissions import IsAdmin, IsAdminOrReadOnly
 from api.filters import TitleFilter
-from reviews.models import User, Category, Genre, Title
+from reviews.models import User, Category, Genre, Review, Title
 
 
 class HTTPMethod:
@@ -130,3 +130,18 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return TitleCreateSerializer
         return TitleReadSerializer
+
+
+# class Review(viewsets.ModelViewSet):
+#     queryset = Review.objects.all()
+#     serializer_class = TitleCreateSerializer
+#     permission_classes = [IsAdminOrReadOnly, ]
+#     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+#     filterset_fields = ['genre__slug', 'category__slug']
+#     filterset_class = TitleFilter
+#     pagination_class = PageNumberPagination
+
+#     def get_serializer_class(self):
+#         if self.action in ['create', 'update', 'partial_update']:
+#             return TitleCreateSerializer
+#         return TitleReadSerializer
