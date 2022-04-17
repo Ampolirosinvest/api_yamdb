@@ -1,3 +1,4 @@
+from turtle import title
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework import viewsets, filters, permissions, mixins
 from rest_framework.response import Response
@@ -9,12 +10,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from http.client import OK, BAD_REQUEST
-from api.serializers import (SignUpSerializer, TokenSerializer, UserSerializer,
-                             CategorySerializer, GenreSerializer,
-                             TitleCreateSerializer, TitleReadSerializer)
-from api.permissions import IsAdmin, IsAdminOrReadOnly
-from api.filters import TitleFilter
+from .serializers import (SignUpSerializer, TokenSerializer, UserSerializer,
+                             CategorySerializer, GenreSerializer, CommentSerializer,
+                             TitleCreateSerializer, TitleReadSerializer, ReviewSerializer)
+from .permissions import IsAdmin, IsAdminOrReadOnly, IsAuthorOrAdminOrModeratorOrReadOnly
+from .filters import TitleFilter
 from reviews.models import User, Category, Genre, Review, Title
+from django.db.models import Avg
 
 
 class HTTPMethod:
@@ -118,7 +120,9 @@ class GenreViewSet(ListCreateDestroyMixin):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.order_by('id').annotate(
+        rating=Avg('reviews__score')
+    )
     serializer_class = TitleCreateSerializer
     permission_classes = [IsAdminOrReadOnly, ]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
@@ -132,16 +136,28 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleReadSerializer
 
 
-# class Review(viewsets.ModelViewSet):
-#     queryset = Review.objects.all()
-#     serializer_class = TitleCreateSerializer
-#     permission_classes = [IsAdminOrReadOnly, ]
-#     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-#     filterset_fields = ['genre__slug', 'category__slug']
-#     filterset_class = TitleFilter
-#     pagination_class = PageNumberPagination
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAuthorOrAdminOrModeratorOrReadOnly,)
 
-#     def get_serializer_class(self):
-#         if self.action in ['create', 'update', 'partial_update']:
-#             return TitleCreateSerializer
-#         return TitleReadSerializer
+    def get_queryset(self):
+        title_id = self.kwargs.get("title_id")
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        serializer.save(author=self.request.user, title=title)
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthorOrAdminOrModeratorOrReadOnly,)
+
+    def get_queryset(self):
+        review_id = self.kwargs.get("review_id")
+        review = get_object_or_404(Review, id=review_id)
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
+        serializer.save(author=self.request.user, review=review)

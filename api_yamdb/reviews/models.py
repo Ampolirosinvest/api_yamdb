@@ -1,4 +1,3 @@
-# from cgitb import text
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -142,44 +141,42 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    text = models.TextField(
-        'Отзыв',
-        # max_length=1000,
-        # blank=True,
-        # null=True
-    )
-    reviewer = models.ForeignKey(
+    text = models.TextField()
+    author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reviewer'
+        related_name='reviews'
     )
-    pub_time = models.DateTimeField('Дата добавления', auto_now_add=True)
+    pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='title'
+        related_name='reviews'
     )
-    rating = models.IntegerField(validators=[MinValueValidator(1),
+    score = models.IntegerField(validators=[MinValueValidator(1),
                                              MaxValueValidator(10)])
 
     class Meta:
-        ordering = ('pub_time',)
+        ordering = ('-pub_date',)
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'reviewer'],
+                fields=['title', 'author'],
                 name='unique_relationships'
             ),
         ]
+    
+    def __str__(self):
+        return self.text
 
 
 class Comment(models.Model):
-    commentator = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='commentator')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='review')
+        Review, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
-    created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True) # , db_index=True)
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True)
     
     class Meta:
         ordering = ('id',)

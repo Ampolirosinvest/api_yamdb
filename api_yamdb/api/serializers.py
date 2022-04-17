@@ -1,5 +1,9 @@
+from email.policy import default
+from pkgutil import read_code
+from pyexpat import model
+from attr import fields
 from rest_framework import serializers
-from reviews.models import User, Category, Genre, Title
+from reviews.models import Comment, User, Category, Genre, Title, Review
 from rest_framework.validators import UniqueValidator
 
 
@@ -83,15 +87,41 @@ class TitleReadSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
+    rating = serializers.IntegerField()
 
     class Meta:
         model = Title
         fields = '__all__'
 
 
-# class ReviewSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         fields = ('pub_date', 'review')
-#         model = Category
-#         lookup_field = 'slug'
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+    )
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
+    def validate(self, data):
+        review = Review.objects.filter(
+            title = self.context['view'].kwargs.get('title_id'),
+            author = self.context['request'].user
+        )
+        request = self.context.get('request')
+        if review.exists() and request.method == 'POST':
+            raise serializers.ValidationError(
+                'Ваш отзыв на это произведение уже опубликован'
+            )
+        return data
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field="username",
+        read_only=True,
+    )
+
+    class Meta:
+        model=Comment
+        fields = ('id', 'text', 'author', 'pub_date')
