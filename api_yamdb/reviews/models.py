@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # from cgitb import text
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -65,6 +66,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+=======
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from users.models import User
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2
 
 
 class Category(models.Model):
@@ -108,30 +114,26 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         'название',
-        blank=False,
         max_length=200,
     )
     year = models.IntegerField(
         'год',
-        blank=True,
-    )
-    category = models.ForeignKey(
-        Category,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='titles',
-    )
-    genre = models.ManyToManyField(
-        Genre,
-        blank=True,
-        related_name='titles',
     )
     description = models.TextField(
         'описание',
         max_length=200,
         blank=True,
         null=True
+    )
+    genre = models.ManyToManyField(
+        Genre,
+        related_name='titles',
+    )
+    category = models.ForeignKey(
+        Category,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='titles',
     )
 
     class Meta:
@@ -142,6 +144,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
+<<<<<<< HEAD
     text = models.TextField(
         'Отзыв',
         # max_length=1000,
@@ -167,10 +170,33 @@ class Review(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'reviewer'],
+=======
+    text = models.TextField()
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    pub_date = models.DateTimeField('Дата добавления', auto_now_add=True)
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    score = models.IntegerField(validators=[MinValueValidator(1),
+                                MaxValueValidator(10)])
+
+    class Meta:
+        ordering = ('-pub_date',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2
                 name='unique_relationships'
             ),
         ]
 
+<<<<<<< HEAD
 
 class Comment(models.Model):
     commentator = models.ForeignKey(
@@ -183,3 +209,20 @@ class Comment(models.Model):
     
     class Meta:
         ordering = ('id',)
+=======
+    def __str__(self):
+        return self.text
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True)
+
+    class Meta:
+        ordering = ('id', )
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2

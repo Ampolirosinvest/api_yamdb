@@ -1,10 +1,16 @@
+from http.client import BAD_REQUEST, OK
+
 from django.contrib.auth.tokens import default_token_generator
-from rest_framework import viewsets, filters, permissions, mixins
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.pagination import PageNumberPagination
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+<<<<<<< HEAD:api_yamdb/api/views.py
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
@@ -15,13 +21,14 @@ from api.serializers import (SignUpSerializer, TokenSerializer, UserSerializer,
 from api.permissions import IsAdmin, IsAdminOrReadOnly
 from api.filters import TitleFilter
 from reviews.models import User, Category, Genre, Review, Title
+=======
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2:api_yamdb/users/users/views.py
 
-
-class HTTPMethod:
-    GET = 'get'
-    PATCH = 'patch'
-    DELETE = 'delete'
-    POST = 'post'
+from users.models import User
+from users.users.serializers import (SignUpSerializer, TokenSerializer,
+                                     UserSerializer)
+from users.utils.permissions import IsAdmin
+from users.utils.httpmethod import HTTPMethod
 
 
 @api_view(["POST"])
@@ -73,19 +80,20 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
     @action(detail=False,
-            methods=[HTTPMethod.GET, HTTPMethod.PATCH, ],
+            methods=[HTTPMethod.GET.value, HTTPMethod.PATCH.value, ],
             permission_classes=[IsAuthenticated, ])
     def me(self, request):
         serializer = UserSerializer(request.user,
                                     data=request.data,
                                     partial=True)
-        if request.user.is_admin or request.user.is_moderator:
+        if request.user.role == 'admin' or request.user.role == 'moderator':
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=OK)
         serializer.is_valid(raise_exception=True)
         serializer.save(role='user')
         return Response(serializer.data, status=OK)
+<<<<<<< HEAD:api_yamdb/api/views.py
 
 
 class ListCreateDestroyMixin(
@@ -145,3 +153,5 @@ class TitleViewSet(viewsets.ModelViewSet):
 #         if self.action in ['create', 'update', 'partial_update']:
 #             return TitleCreateSerializer
 #         return TitleReadSerializer
+=======
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2:api_yamdb/users/users/views.py

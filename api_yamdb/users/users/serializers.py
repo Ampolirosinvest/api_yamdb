@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from reviews.models import User, Category, Genre, Title
 from rest_framework.validators import UniqueValidator
+from users.models import User
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -41,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
         model = User
+<<<<<<< HEAD:api_yamdb/api/serializers.py
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -95,3 +96,5 @@ class TitleReadSerializer(serializers.ModelSerializer):
 #         fields = ('pub_date', 'review')
 #         model = Category
 #         lookup_field = 'slug'
+=======
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2:api_yamdb/users/users/serializers.py
