@@ -1,8 +1,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+<<<<<<< HEAD
 from .views import (CommentViewSet, singup, token_jwt, UserViewSet, CategoryViewSet,
                     GenreViewSet, TitleViewSet, ReviewViewSet)
+=======
+from api.titles.views import (CategoryViewSet, CommentViewSet, GenreViewSet,
+                              ReviewViewSet, TitleViewSet)
+from users.users.views import UserViewSet, singup, token_jwt
+>>>>>>> join
 
 
 router = DefaultRouter()

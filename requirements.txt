@@ -4,4 +4,9 @@ djangorestframework==3.12.4
 PyJWT==2.1.0
 pytest==6.2.4
 pytest-django==4.4.0
+<<<<<<< HEAD
 pytest-pythonpath==0.7.3
+=======
+pytest-pythonpath==0.7.3
+djangorestframework-simplejwt==5.1.0
+>>>>>>> 2a758645c99555ec945f65f2e6aba65a30cdf4f2
